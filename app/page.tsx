@@ -21,7 +21,11 @@ const signedMan=(value:number)=>Number.isFinite(value)?`${value>0?"+":value<0?"�
 const duration=(months:number)=>months<12?`${months}カ月`:`${Math.floor(months/12)}年${months%12?`${months%12}カ月`:""}`;
 
 function NumberInput({label,value,unit,onChange,min=0,max,step=1,note}:{label:string;value:number;unit:string;onChange:(value:number)=>void;min?:number;max?:number;step?:number;note?:string}){
-  return <label className="field"><span className="field-label">{label}</span><span className="input-shell"><input type="number" inputMode="decimal" value={value} min={min} max={max} step={step} onChange={(event)=>onChange(event.target.value===""?0:Number(event.target.value))}/><b>{unit}</b></span>{note&&<small>{note}</small>}</label>;
+  const[draft,setDraft]=useState(String(value));
+  useEffect(()=>setDraft(String(value)),[value]);
+  const handleChange=(raw:string)=>{setDraft(raw);if(raw!=="")onChange(Number(raw))};
+  const handleBlur=()=>{if(draft===""){setDraft("0");onChange(0)}};
+  return <label className="field"><span className="field-label">{label}</span><span className="input-shell"><input type="number" inputMode="decimal" value={draft} min={min} max={max} step={step} onChange={event=>handleChange(event.target.value)} onBlur={handleBlur}/><b>{unit}</b></span>{note&&<small>{note}</small>}</label>;
 }
 function DetailRows({rows}:{rows:[string,string][]}){return <dl className="detail-rows">{rows.map(([label,value])=><div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>}
 
